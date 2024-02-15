@@ -1,0 +1,87 @@
+Moving from Yii2 to JavaFX; Keep:
+- Consider adding price per book and per collection
+- Would custom fields be useful? Maybe version 2.
+- For ebooks and audiobooks, link(?) to files (may need a user directory, somewhere in user's home?)
+- Allow for back cover also? may for 1.5 or 2.0
+
+java.util.Date dt = new java.util.Date();
+java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+dt.format(sdf); //?toString?
+primaryStage.getScene().getWindow().addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, this::closeWindowEvent);
+
+Details/Objects:
+- Publisher [Name, URL, short description]
+- Series [Name, number of books in series, number of owned books in series (could be automatic), flag marking the series as finished/completed]
+- Language
+- ISBN (always 13); maybe allow for ASIN and Google ID
+- Link (for any user provided site, eg. goodreads, amazon)
+- Added on
+- Format (paperback, hard cover, etc.; depends on item type, need a list of common types)
+- Publish date
+- Publish year, for when no date is available
+- No. in series (or just order even if no series was explicitly created)
+- Edition
+- Volume (for paper only?)
+- Plot
+- Review text
+- Genre
+- Info related to translation  (if translated, original title)
+- Flag to mark the book as read
+- Number of owned copies
+- Subtitle (can be useful for non-fiction books)
+- Page count, duration (audio, in minutes), size in KB (both ebook and audio)
+- Audio specific info (eg. bitrate, narrator)
+- Filename for ebooks and audio files
+- Location/path, manually set by user, can be anything from a file path to "calibre library"
+- Store/Seller name (simple text), eg.: Humble Bundle
+- Item type to identify the 3 types of "books" being managed
+- Rating (remove own rating, always own)
+- Cover (front for now, back cover later)
+- Authors (multiple authors per book, don't set a main author, user can just list them by order)
+
+Default UI:
+- Table with list of books, filtered by type (allow a "show all" filter); when selected, show right side panel with main details;
+- On details, offer link/access to other books by the same author, other books in series, other books in collection, other books by same publisher
+- Offer default "Reading List" and "Favorite" collections (remove favorite flag from item details)
+- Offer init/setup process where:
+    > User can select database location
+    > User can select language
+    > User can setup initial account, even if only providing username/name/email
+
+Future/Ideas:
+- Add ebook reader and audio player? Audio player would be interesting to have and to develop.
+
+TableColumn2<Item, Float> ratingCol = new TableColumn2<>("Rating");
+        ratingCol.setCellValueFactory(new PropertyValueFactory<>("rating"));
+        ratingCol.setCellFactory(param -> new TableCell<Item, Float>() {
+            private final Rating star;
+
+            {
+                star = new Rating();
+                star.setMax(5);
+                star.setMaxHeight(32);
+                star.setPrefHeight(32);
+                star.setUpdateOnHover(true);
+            }
+
+            @Override
+            protected void updateItem(Float rating, boolean empty) {
+                super.updateItem(rating, empty);
+                if (rating == null || empty) {
+                    setText(null);
+                    setGraphic(null);
+                    return;
+                }
+
+                star.setRating(rating);
+                setGraphic(star);
+            }
+        });
+        items.getColumns().add(ratingCol);
+
+        items.getSelectionModel().getSelectedItems().addListener(new ListChangeListener<Item>() {
+                    @Override
+                    public void onChanged(Change<? extends Item> c) {
+                        System.out.println(c.getList());
+                    }
+                });
